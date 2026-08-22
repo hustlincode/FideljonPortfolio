@@ -1,141 +1,78 @@
 import React from "react";
-import { Container, Row, Col } from "react-bootstrap";
 import { FaXTwitter } from "react-icons/fa6";
-import {
-  AiFillGithub,
-  AiFillInstagram,
-  AiFillFacebook,
-} from "react-icons/ai";
-import { FaLinkedinIn } from "react-icons/fa";
+import { AiFillGithub, AiFillInstagram, AiFillFacebook } from "react-icons/ai";
+import { FaLinkedinIn, FaArrowUp } from "react-icons/fa";
+
+const SOCIALS = [
+  {
+    label: "GitHub",
+    href: "https://github.com/hustlincode",
+    icon: <AiFillGithub />
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/fidel-jon-magat",
+    icon: <FaLinkedinIn />
+  },
+  {
+    label: "Twitter / X",
+    href: "https://twitter.com/fideljon_",
+    icon: <FaXTwitter />
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/fideljon",
+    icon: <AiFillInstagram />
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/maginoo21",
+    icon: <AiFillFacebook />
+  }
+];
 
 function Footer() {
-  let date = new Date();
-  let year = date.getFullYear();
+  const year = new Date().getFullYear();
+
+  const backToTop = (event) => {
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <Container fluid className="footer">
-    <Row>
-          <Col md={12} className="home-about-social">
-            <h1>FIND ME ON</h1>
-            <p>
-              Feel free to <span className="purple">connect </span>with me
-            </p>
-            <ul className="home-about-social-links">
-              <li className="social-icons">
-                <a
-                  href="https://github.com/hustlincode"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="icon-colour  home-social-icons"
-                >
-                  <AiFillGithub />
-                </a>
-              </li>
-              <li className="social-icons">
-                <a
-                  href="https://www.linkedin.com/in/fidel-jon-magat"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="icon-colour  home-social-icons"
-                >
-                  <FaLinkedinIn />
-                </a>
-              </li>
-              <li className="social-icons">
-                <a
-                  href="https://twitter.com/fideljon_"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="icon-colour  home-social-icons"
-                >
-                  <FaXTwitter />
-                </a>
-              </li>
-              <li className="social-icons">
-                <a
-                  href="https://www.instagram.com/fideljon"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="icon-colour home-social-icons"
-                >
-                  <AiFillInstagram />
-                </a>
-              </li>
-              <li className="social-icons">
-                <a
-                  href="https://www.facebook.com/maginoo21"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="icon-colour home-social-icons"
-                >
-                  <AiFillFacebook />
-                </a>
-              </li>
-            </ul>
-          </Col>
-        </Row>
-      <Row>
-        <Col md="4" className="footer-copywright">
-          <h3>Designed and Developed by Fidel Jon Magat</h3>
-        </Col>
-        <Col md="4" className="footer-copywright">
-          <h3>Copyright © {year} FJM</h3>
-        </Col>
-        <Col md="4" className="footer-body">
-          <ul className="footer-icons">
-            <li className="social-icons">
-              <a
-                href="https://github.com/hustlincode"
-                style={{ color: "white" }}
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <AiFillGithub />
+    <footer className="footer">
+      <div className="container-x">
+        <h2 className="footer-cta">
+          Have an idea? Let&rsquo;s build it <span className="serif-accent">together.</span>
+        </h2>
+
+        <a className="link-sweep footer-email" href="mailto:fideljonmagat25@gmail.com">
+          fideljonmagat25@gmail.com
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M7 17 17 7M8 7h9v9" />
+          </svg>
+        </a>
+
+        <ul className="footer-socials">
+          {SOCIALS.map((social) => (
+            <li key={social.label}>
+              <a href={social.href} target="_blank" rel="noreferrer noopener">
+                <span aria-hidden="true">{social.icon}</span>
+                {social.label}
               </a>
             </li>
-            <li className="social-icons">
-              <a
-                href="https://twitter.com/fideljon_"
-                style={{ color: "white" }}
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <FaXTwitter />
-              </a>
-            </li>
-            <li className="social-icons">
-              <a
-                href="https://www.linkedin.com/in/fidel-jon-magat-558ba3285/"
-                style={{ color: "white" }}
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <FaLinkedinIn />
-              </a>
-            </li>
-            <li className="social-icons">
-              <a
-                href="https://www.instagram.com/fideljon_"
-                style={{ color: "white" }}
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <AiFillInstagram />
-              </a>
-            </li>
-            <li className="social-icons">
-              <a
-                href="https://www.facebook.com/maginoo21"
-                style={{ color: "white" }}
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                <AiFillFacebook />
-              </a>
-            </li>
-          </ul>
-        </Col>
-      </Row>
-    </Container>
+          ))}
+        </ul>
+
+        <div className="footer-bottom">
+          <span>© {year} FJM — Designed and developed by Fidel Jon Magat</span>
+          <a href="#top" className="back-top link-sweep" onClick={backToTop}>
+            Back to top
+            <FaArrowUp size={12} />
+          </a>
+        </div>
+      </div>
+    </footer>
   );
 }
 
