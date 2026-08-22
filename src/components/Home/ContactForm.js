@@ -1,19 +1,18 @@
-// ContactForm.js
 import React, { useState, useRef } from "react";
-import { FaPaperPlane, FaUser, FaEnvelope, FaComment } from "react-icons/fa";
-import emailjs from '@emailjs/browser';
+import emailjs from "@emailjs/browser";
+import Reveal from "../Reveal";
 
 const ContactForm = () => {
-  const formRef = useRef(); // EmailJS uses a ref to access the form
+  const formRef = useRef();
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState('');
+  const [submitStatus, setSubmitStatus] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -25,50 +24,63 @@ const ContactForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus('');
+    setSubmitStatus("");
 
     try {
-        // Send to second template
-        await emailjs.sendForm(
-            'service_myqa4bd',
-            'template_ruvu8sz',
-            formRef.current,
-            'JGx4g-OCv2zLtpJEu'
-        );
+      await emailjs.sendForm(
+        "service_myqa4bd",
+        "template_ruvu8sz",
+        formRef.current,
+        "JGx4g-OCv2zLtpJEu"
+      );
 
-        // Send to second template
-        await emailjs.sendForm(
-            'service_myqa4bd',
-            'template_n9gw0bo',
-            formRef.current,
-            'JGx4g-OCv2zLtpJEu'
-        );
+      await emailjs.sendForm(
+        "service_myqa4bd",
+        "template_n9gw0bo",
+        formRef.current,
+        "JGx4g-OCv2zLtpJEu"
+      );
 
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setSubmitStatus("success");
+      setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      console.error('Email sending error:', error);
-      setSubmitStatus('error');
+      console.error("Email sending error:", error);
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="contact-form-container">
-      <h1 style={{ fontSize: "2.6em", color: "#fff", textAlign: "center", marginBottom: "20px" }}>
-        GET IN <span className="purple">TOUCH</span>
-      </h1>
-      <p style={{ textAlign: "center", color: "#c770f0", fontSize: "1.2em", marginBottom: "50px" }}>
-        Have a project in mind? Let's work together!
-      </p>
+    <section className="section" id="contact">
+      <div className="container-x">
+        <Reveal>
+          <div className="contact-grid">
+            <div>
+              <p className="eyebrow">04 &mdash; Contact</p>
+              <h2 className="display-1 contact-heading">
+                Get in <span className="serif-accent">touch</span>
+              </h2>
+              <p className="contact-sub body-copy">
+                Have a project in mind? Let&rsquo;s work together — my inbox is
+                always open.
+              </p>
 
-      <div className="contact-form-wrapper">
-        <form ref={formRef} onSubmit={handleSubmit} className="contact-form">
-          <div className="form-row">
-            <div className="form-group">
-              <div className="input-wrapper">
-                <FaUser className="input-icon" />
+              <a
+                href="mailto:fideljonmagat25@gmail.com"
+                className="link-sweep contact-email"
+              >
+                fideljonmagat25@gmail.com
+              </a>
+
+              <p className="avail-note">
+                <span className="status-dot" aria-hidden="true"></span>
+                Currently available for freelance &amp; full-time roles
+              </p>
+            </div>
+
+            <form ref={formRef} onSubmit={handleSubmit} className="contact-form">
+              <div className="form-field">
                 <input
                   type="text"
                   name="name"
@@ -77,12 +89,11 @@ const ContactForm = () => {
                   onChange={handleChange}
                   required
                   className="form-input"
+                  aria-label="Your Name"
                 />
               </div>
-            </div>
-            <div className="form-group">
-              <div className="input-wrapper">
-                <FaEnvelope className="input-icon" />
+
+              <div className="form-field">
                 <input
                   type="email"
                   name="email"
@@ -91,69 +102,66 @@ const ContactForm = () => {
                   onChange={handleChange}
                   required
                   className="form-input"
+                  aria-label="Your Email"
                 />
               </div>
-            </div>
+
+              <div className="form-field">
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  className="form-input"
+                  aria-label="Subject"
+                />
+              </div>
+
+              <div className="form-field">
+                <textarea
+                  name="message"
+                  placeholder="Your Message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows="6"
+                  className="form-input"
+                  aria-label="Your Message"
+                />
+              </div>
+
+              <button type="submit" disabled={isSubmitting} className="btn-primary">
+                {isSubmitting ? "Sending…" : "Send Message"}
+                {!isSubmitting && (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M7 17 17 7M8 7h9v9" />
+                  </svg>
+                )}
+              </button>
+
+              {submitStatus === "success" && (
+                <div className="status-message success" role="status">
+                  Message sent successfully! I&rsquo;ll get back to you soon.
+                </div>
+              )}
+
+              {submitStatus === "error" && (
+                <div className="status-message error" role="alert">
+                  Failed to send message. Please try again, or email me directly
+                  at{" "}
+                  <a href="mailto:fideljonmagat25@gmail.com" className="link-sweep">
+                    fideljonmagat25@gmail.com
+                  </a>
+                  .
+                </div>
+              )}
+            </form>
           </div>
-
-          <div className="form-group">
-            <div className="input-wrapper">
-              <FaComment className="input-icon" />
-              <input
-                type="text"
-                name="subject"
-                placeholder="Subject"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <div className="input-wrapper">
-              <FaComment className="input-icon textarea-icon" />
-              <textarea
-                name="message"
-                placeholder="Your Message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                rows="6"
-                className="form-textarea"
-              />
-            </div>
-          </div>
-
-          <button type="submit" disabled={isSubmitting} className="submit-button">
-            {isSubmitting ? (
-              <>
-                <div className="spinner"></div>
-                Sending...
-              </>
-            ) : (
-              <>
-                <FaPaperPlane />
-                Send Message
-              </>
-            )}
-          </button>
-
-          {submitStatus === 'success' && (
-            <div className="status-message success">
-              Message sent successfully! I'll get back to you soon.
-            </div>
-          )}
-
-          {submitStatus === 'error' && (
-            <div className="status-message error">
-              Failed to send message. Please try again or contact me directly.
-            </div>
-          )}
-        </form>
+        </Reveal>
       </div>
-    </div>
+    </section>
   );
 };
 

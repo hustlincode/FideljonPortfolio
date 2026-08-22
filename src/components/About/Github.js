@@ -1,21 +1,27 @@
 import React from "react";
 import GitHubCalendar from "react-github-calendar";
-import { Row } from "react-bootstrap";
+import { useTheme } from "../../theme/ThemeContext";
+
+const ACCENTS = {
+  dark: "#c770f0",
+  light: "#8b36d9"
+};
 
 function Github() {
+  const { theme } = useTheme();
+
   return (
-    <Row style={{ justifyContent: "center", paddingBottom: "10px" }}>
-      <h1 className="project-heading" style={{ paddingBottom: "20px" }}>
-        Days I <strong className="purple">Code</strong>
-      </h1>
+    <div className="github-cal" style={{ marginTop: "clamp(40px, 6vh, 64px)" }}>
+      <p className="eyebrow">Days I code</p>
       <GitHubCalendar
+        key={theme}
         username="hustlincode"
-        blockSize={15}
-        blockMargin={5}
-        color="#c084f5"
-        fontSize={16}
+        blockSize={13}
+        blockMargin={4}
+        fontSize={13}
+        color={ACCENTS[theme]}
       />
-    </Row>
+    </div>
   );
 }
 
