@@ -82,7 +82,7 @@ const ChatBot = () => {
     setIsTyping(true);
 
     try {
-      const model = "gemini-2.0-flash";
+      const model = "gemini-3.6-flash";
       const contents = [
         { role: "user", parts: [{ text: userInput }] }
       ];
