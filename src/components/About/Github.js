@@ -3,8 +3,8 @@ import GitHubCalendar from "react-github-calendar";
 import { useTheme } from "../../theme/ThemeContext";
 
 const ACCENTS = {
-  dark: "#c770f0",
-  light: "#8b36d9"
+  dark: "#ff7b1c",
+  light: "#e8590c"
 };
 
 function Github() {

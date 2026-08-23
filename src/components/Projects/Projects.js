@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Reveal from "../Reveal";
+import Lightbox from "../Lightbox";
 import salesportal from "../../Assets/Projects/Salesportal.png";
 import onlinecheckin from "../../Assets/Projects/XOLF.png";
 import slfreemed from "../../Assets/Projects/slfreemed.png";
@@ -37,6 +38,7 @@ const PROJECTS = [
 function Projects() {
   const [activeIndex, setActiveIndex] = useState(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [lightboxIndex, setLightboxIndex] = useState(null);
   const canHover =
     typeof window !== "undefined" &&
     window.matchMedia &&
@@ -52,7 +54,10 @@ function Projects() {
   const rowProps = (index) =>
     canHover
       ? {
-          onMouseEnter: () => setActiveIndex(index),
+          onMouseEnter: (event) => {
+            setActiveIndex(index);
+            setPos({ x: event.clientX, y: event.clientY });
+          },
           onMouseLeave: () => setActiveIndex(null)
         }
       : {};
@@ -101,16 +106,30 @@ function Projects() {
                   </p>
                 </div>
 
-                <span className="work-arrow" aria-hidden="true">
+                <button
+                  type="button"
+                  className="work-arrow"
+                  aria-label={`Open ${project.title} screenshot`}
+                  onClick={() => setLightboxIndex(index)}
+                >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <path d="M7 17 17 7M8 7h9v9" />
                   </svg>
-                </span>
+                </button>
               </article>
             </Reveal>
           ))}
         </div>
       </div>
+
+      {lightboxIndex !== null && (
+        <Lightbox
+          src={PROJECTS[lightboxIndex].img}
+          title={PROJECTS[lightboxIndex].title}
+          context={PROJECTS[lightboxIndex].context}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
 
       {canHover && (
         <div

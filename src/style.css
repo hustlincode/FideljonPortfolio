@@ -766,11 +766,14 @@ textarea {
 .work-arrow {
   width: 44px;
   height: 44px;
+  padding: 0;
+  cursor: pointer;
   border: 1px solid var(--border);
   border-radius: 999px;
   display: grid;
   place-items: center;
   color: var(--text-secondary);
+  background: transparent;
   transition: transform 250ms var(--ease-out), color var(--transition-fast),
     border-color var(--transition-fast), background-color var(--transition-fast);
   margin-top: 4px;
@@ -835,6 +838,95 @@ textarea {
   transition: transform 400ms var(--ease-out), filter 300ms ease;
 }
 
+html.lightbox-open {
+  overflow: hidden;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 48px);
+  background: var(--backdrop);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  animation: lightboxFade 300ms var(--ease-out);
+}
+
+@keyframes lightboxFade {
+  from {
+    opacity: 0;
+  }
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: transform var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.lightbox-close:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: rotate(90deg);
+}
+
+.lightbox-figure {
+  margin: 0;
+  max-width: min(1000px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: lightboxZoom 380ms var(--ease-out);
+}
+
+@keyframes lightboxZoom {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(14px);
+  }
+}
+
+.lightbox-figure img {
+  max-width: 100%;
+  max-height: min(74vh, 760px);
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 32px 80px var(--shadow);
+}
+
+.lightbox-caption {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.lightbox-caption strong {
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
 .skills-head {
   margin-bottom: clamp(32px, 5vh, 52px);
 }
@@ -861,11 +953,20 @@ textarea {
 }
 
 .skill-items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 6px;
   font-size: clamp(1rem, 1.5vw, 1.15rem);
   line-height: 1.8;
+  min-width: 0;
 }
 
-.skill-items span + span::before {
+.skill-items span {
+  overflow-wrap: anywhere;
+}
+
+.skill-items span:not(:last-child)::after {
   content: "·";
   margin-inline: 12px;
   color: var(--accent);
