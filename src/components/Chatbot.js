@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";
-import { FaArrowRight, FaTimes } from "react-icons/fa";
+import { FaArrowRight, FaTimes, FaMicrophone, FaStop, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import aetherAvatar from "../Assets/aether-avatar.svg";
 import chatbotData from "../config/chatbotConfig.json";
 import "../Chatbot.css";
+import useSpeechRecognition from "../hooks/useSpeechRecognition";
+import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 
 import {
   GoogleGenAI,
@@ -107,6 +109,29 @@ const ChatBot = () => {
   const nudgedRef = useRef(false);
   const visitorTypeRef = useRef(null);
   const coveredRef = useRef([]);
+  const autoSendTimeoutRef = useRef(null);
+  const inputRef = useRef(null);
+  const sendMessageRef = useRef(null);
+
+  const {
+    isSupported: isSTTSupported,
+    isListening,
+    transcript,
+    interimTranscript,
+    error: sttError,
+    startListening,
+    stopListening,
+    resetTranscript,
+  } = useSpeechRecognition({ lang: "en-US" });
+
+  const {
+    isSupported: isTTSSupported,
+    isSpeaking,
+    isMuted,
+    speak,
+    cancel: cancelSpeech,
+    toggleMute,
+  } = useSpeechSynthesis();
 
   const greetingText = useMemo(
     () =>
@@ -133,7 +158,50 @@ const ChatBot = () => {
     return () => clearInterval(interval);
   }, [isOpen]);
 
+  // Surface STT errors as bot message (ignore transient no-speech while still listening - auto-restart will handle)
+  useEffect(() => {
+    if (!sttError) return;
+    if (sttError === "not-allowed" || sttError === "service-not-allowed") {
+      addMessage("bot", "Mic blocked — please allow microphone access in your browser settings and reload, then tap mic again.");
+    } else if (sttError === "no-speech") {
+      // only surface if not still listening (hook auto-restarts once if shouldListen)
+      if (!isListening) {
+        addMessage("bot", "Didn't catch that — try tapping the mic again and speaking clearly.");
+      }
+    } else if (sttError === "audio-capture") {
+      addMessage("bot", "No microphone found — check your device audio input and that no other app is using the mic.");
+    } else if (sttError === "not-supported") {
+      addMessage("bot", "Voice input isn't supported in this browser — try Chrome or Edge on desktop.");
+    } else if (sttError === "network") {
+      const online = typeof navigator !== "undefined" ? navigator.onLine : true;
+      if (!online) {
+        addMessage("bot", "You're offline — voice needs internet (Chrome sends audio to Google). Reconnect and tap mic again.");
+      } else {
+        addMessage(
+          "bot",
+          "Voice service unreachable — Chrome couldn't reach Google's speech servers. Check: 1) internet is stable, 2) no VPN/firewall/ad-blocker blocking google.com or speech.googleapis.com, 3) you're on HTTPS (or http://localhost), 4) try reloading. Retrying in 1s or tap mic again. You can also type instead."
+        );
+      }
+    }
+    console.warn("[Chatbot STT error]", sttError, "online:", typeof navigator !== "undefined" ? navigator.onLine : "unknown", "isSecureContext:", typeof window !== "undefined" ? window.isSecureContext : "unknown");
+  }, [sttError, isListening]);
+
+  // Cleanup auto-send on unmount
+  useEffect(() => () => {
+    if (autoSendTimeoutRef.current) clearTimeout(autoSendTimeoutRef.current);
+    try { cancelSpeech(); } catch {}
+  }, [cancelSpeech]);
+
   const toggleClose = () => {
+    // barge-in: stop voice immediately
+    try { cancelSpeech(); } catch {}
+    if (isListening) {
+      try { stopListening(); } catch {}
+    }
+    if (autoSendTimeoutRef.current) {
+      clearTimeout(autoSendTimeoutRef.current);
+      autoSendTimeoutRef.current = null;
+    }
     setClosing(true);
     setTimeout(() => {
       setIsOpen(false);
@@ -271,6 +339,11 @@ Traits: ${JSON.stringify(chatbotData.personal_traits)}
     );
   };
 
+  const speakIfEnabled = (text) => {
+    if (!isTTSSupported || isMuted || !text) return;
+    try { speak(text); } catch {}
+  };
+
   const sendToGemini = async (userInput) => {
     setIsTyping(true);
     historyRef.current.push({ role: "user", parts: [{ text: userInput }] });
@@ -310,13 +383,13 @@ Traits: ${JSON.stringify(chatbotData.personal_traits)}
 
         if (!started) {
           setIsTyping(false);
-          addMessage(
-            "bot",
-            `I'm best at answering questions about ${OWNER_NAME}'s background, engineering approach, and AI experience — want to ask about one of those?`
-          );
+          const fallback = `I'm best at answering questions about ${OWNER_NAME}'s background, engineering approach, and AI experience — want to ask about one of those?`;
+          addMessage("bot", fallback);
+          speakIfEnabled(fallback);
         } else {
           historyRef.current.push({ role: "model", parts: [{ text: reply }] });
           maybeNudgeContact();
+          speakIfEnabled(reply);
         }
         setIsTyping(false);
         return;
@@ -329,16 +402,41 @@ Traits: ${JSON.stringify(chatbotData.personal_traits)}
         console.error("Error talking to Gemini:", error);
         setIsTyping(false);
         if (isRateLimitError(error)) {
-          addMessage(
-            "bot",
-            "Aether's hit today's message limit — thanks for understanding! Feel free to come back later, or leave your details and Fildejon will follow up directly.",
-            { href: "#contact", label: "Leave your details" }
-          );
+          const msg = "Aether's hit today's message limit — thanks for understanding! Feel free to come back later, or leave your details and Fildejon will follow up directly.";
+          addMessage("bot", msg, { href: "#contact", label: "Leave your details" });
+          speakIfEnabled(msg);
         } else {
-          addMessage("bot", "Oops! Something went wrong on my end. Mind trying that again?");
+          const msg = "Oops! Something went wrong on my end. Mind trying that again?";
+          addMessage("bot", msg);
+          speakIfEnabled(msg);
         }
         return;
       }
+    }
+  };
+
+  const handleInputChange = (e) => {
+    if (autoSendTimeoutRef.current) {
+      clearTimeout(autoSendTimeoutRef.current);
+      autoSendTimeoutRef.current = null;
+    }
+    setInput(e.target.value);
+  };
+
+  const handleMicClick = () => {
+    if (autoSendTimeoutRef.current) {
+      clearTimeout(autoSendTimeoutRef.current);
+      autoSendTimeoutRef.current = null;
+    }
+    // barge-in: stop speaking before listening
+    if (isSpeaking) {
+      try { cancelSpeech(); } catch {}
+    }
+    if (isListening) {
+      stopListening();
+    } else {
+      resetTranscript();
+      startListening();
     }
   };
 
@@ -347,6 +445,18 @@ Traits: ${JSON.stringify(chatbotData.personal_traits)}
     if (!text || isTyping) return;
     if (text.length > LIMITS.MAX_CHARS) return;
     if (!isOpen) return;
+    // barge-in: interrupt TTS
+    if (isSpeaking) {
+      try { cancelSpeech(); } catch {}
+    }
+    if (isListening) {
+      try { stopListening(); } catch {}
+    }
+    if (autoSendTimeoutRef.current) {
+      clearTimeout(autoSendTimeoutRef.current);
+      autoSendTimeoutRef.current = null;
+    }
+    try { resetTranscript(); } catch {}
 
     const gate = checkRateLimit();
     if (!gate.ok) {
@@ -377,6 +487,29 @@ Traits: ${JSON.stringify(chatbotData.personal_traits)}
     setInput("");
     sendToGemini(text);
   };
+
+  // keep ref in sync for hybrid effect (A3)
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  });
+
+  // A3 Hybrid + B1 Live: when final transcript arrives, fill input and auto-send after 800ms (cancel if user edits)
+  // Also handles interim promotion fallback if onend promoted interim->transcript
+  useEffect(() => {
+    if (isListening) return;
+    const finalText = (transcript || interimTranscript).trim();
+    if (!finalText) return;
+    const clipped = finalText.slice(0, LIMITS.MAX_CHARS);
+    setInput(clipped);
+    setTimeout(() => inputRef.current?.focus(), 50);
+    if (autoSendTimeoutRef.current) clearTimeout(autoSendTimeoutRef.current);
+    autoSendTimeoutRef.current = setTimeout(() => {
+      autoSendTimeoutRef.current = null;
+      try { cancelSpeech(); } catch {}
+      if (sendMessageRef.current) sendMessageRef.current(clipped);
+      try { resetTranscript(); } catch {}
+    }, 800);
+  }, [transcript, interimTranscript, isListening, cancelSpeech, resetTranscript]);
 
   const getSuggestions = () => {
     if (!isOpen || isTyping) return [];
@@ -430,12 +563,27 @@ Traits: ${JSON.stringify(chatbotData.personal_traits)}
                 <h5>Chat with {BOT_NAME}</h5>
                 <span className="status">
                   <span className="online-dot"></span> Online · AI Assistant · Powered by Gemini
+                  {isSTTSupported && isListening && <span className="voice-status"> · Listening...</span>}
+                  {isTTSSupported && isSpeaking && !isMuted && <span className="voice-status"> · Speaking...</span>}
                 </span>
               </div>
             </div>
-            <button className="close-btn" onClick={toggleClose} aria-label="Close chat">
-              <FaTimes />
-            </button>
+            <div className="chat-header-actions">
+              {isTTSSupported && (
+                <button
+                  className={`tts-toggle ${isMuted ? "muted" : ""} ${isSpeaking && !isMuted ? "speaking" : ""}`}
+                  onClick={toggleMute}
+                  aria-label={isMuted ? "Unmute voice" : "Mute voice"}
+                  title={isMuted ? "Unmute voice" : "Mute voice"}
+                  type="button"
+                >
+                  {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+                </button>
+              )}
+              <button className="close-btn" onClick={toggleClose} aria-label="Close chat">
+                <FaTimes />
+              </button>
+            </div>
           </div>
 
           <div className="chat-body" aria-live="polite">
@@ -487,16 +635,46 @@ Traits: ${JSON.stringify(chatbotData.personal_traits)}
 
           <div className="chat-footer">
             <input
+              ref={inputRef}
               type="text"
-              placeholder={inputDisabled ? "Cooling down — try again shortly..." : `Ask ${BOT_NAME} anything...`}
-              value={input}
+              placeholder={
+                isListening
+                  ? "Listening — speak now..."
+                  : inputDisabled
+                  ? "Cooling down — try again shortly..."
+                  : isSTTSupported
+                  ? `Ask ${BOT_NAME} anything or tap mic...`
+                  : `Ask ${BOT_NAME} anything...`
+              }
+              value={isListening ? interimTranscript || transcript || input : input || transcript || interimTranscript}
               maxLength={LIMITS.MAX_CHARS}
               disabled={inputDisabled}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               aria-label="Message"
+              className={isListening ? "listening" : transcript || interimTranscript ? "has-voice-preview" : ""}
             />
-            <button onClick={() => sendMessage()} disabled={inputDisabled || !input.trim()} aria-label="Send message">
+            {isSTTSupported ? (
+              <button
+                className={`mic-btn ${isListening ? "listening" : ""}`}
+                onClick={handleMicClick}
+                disabled={isTyping}
+                aria-label={isListening ? "Stop listening" : "Start voice input"}
+                title={
+                  isListening
+                    ? "Stop listening"
+                    : inputDisabled
+                    ? "Cooling down — but you can still speak to queue"
+                    : "Tap to speak"
+                }
+                type="button"
+              >
+                {isListening ? <FaStop /> : <FaMicrophone />}
+              </button>
+            ) : (
+              <span className="mic-unsupported" title="Voice not supported in this browser">🎙️</span>
+            )}
+            <button onClick={() => sendMessage()} disabled={inputDisabled || (!input.trim() && !transcript.trim() && !interimTranscript.trim())} aria-label="Send message" className="send-btn">
               <FaArrowRight />
             </button>
           </div>
