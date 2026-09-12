@@ -9,11 +9,11 @@
     "He documents decisions (in the spirit of Architecture Decision Records) so systems remain understandable as they grow.",
     "He balances pragmatism with best practices — choosing the right level of complexity for the problem at hand instead of over-engineering.",
     "He keeps consistent standards across projects: naming conventions, API design, error handling, and testing strategy.",
-    "Concrete proof points: he optimized a core reporting query from 15 seconds to ~500ms via SQL tuning and stored procedures, built a .NET microservice syncing on-premise and cloud data via DynamoDB, and set up Git-based CI/CD that cut deployment steps by half."
+    "Concrete proof points: he built a microservice syncing on-premise and cloud data via REST/HTTP APIs and DynamoDB (Xenia Online), an NSSM-based background service that automates tech-support triage across client deployments (Halo Protocol), and a Git-based CI/CD pipeline that cut deployment steps by half."
   ],
   "ai_usage_philosophy": {
-    "summary": "For Fildejon, AI isn't a buzzword — it is actively integrated into his daily engineering work in two ways:",
-    "development_maintenance": "He uses AI tools daily (Codex, ChatGPT, Claude) to accelerate coding, debugging, refactoring, and maintaining existing systems — while keeping logic and architecture decisions self-directed. The AI speeds him up; he stays the engineer.",
+    "summary": "For Fildejon, AI coding assistants (Claude, Codex, ChatGPT) are a daily force multiplier for fast, production-ready \"vibe coding\" — while he keeps architecture and logic self-directed. He uses AI in two ways:",
+    "development_maintenance": "He uses AI tools daily to accelerate full-stack implementation — writing backend APIs, refactoring UI, and debugging faster — while keeping logic, architecture, and code-quality decisions self-directed rather than AI-dictated. The AI speeds him up; he stays the engineer. He's also comfortable adopting new AI coding tools, such as Claude Code.",
     "integrations": "Beyond using AI as a coding assistant, he builds AI-powered integrations into the products and systems themselves, embedding useful AI capabilities into what he ships.",
     "stance": "His stance is practical, not hype-driven: AI is a tool that improves engineering velocity and system capability, grounded in real daily use rather than trend-chasing."
   },
@@ -68,7 +68,7 @@
   "personal_info": {
     "name": "Fidel Jon Magat",
     "nickname": "Fildejon",
-    "title": "Junior Software Developer — Full-Stack (PHP · .NET · React/TypeScript)",
+    "title": "Full-Stack Junior Software Developer (PHP · .NET · React/TypeScript)",
     "location": "Angeles City, Pampanga, Philippines",
     "email": "fideljonmagat25@gmail.com",
     "phone": "(+63) 994-238-7240",
@@ -79,19 +79,20 @@
     "linkedin": "linkedin.com/in/fidel-jon-magat",
     "github": "github.com/hustlincode"
   },
-  "professional_summary": "Full-stack Junior Software Developer with 2+ years of professional experience shipping production systems for the hospitality and hotel industry — currently supporting an app used by roughly 700 end users across ~250 client properties. Delivered a BIR-compliant Compliance Accounting System (CAS) integration, cut a core reporting query from 15 seconds to 500ms through SQL and stored-procedure optimization, and built the Xenia Online microservice syncing on-premise and cloud data via DynamoDB and S3. Works daily with AI-assisted development tools (Codex, ChatGPT, Claude) to speed up implementation while keeping logic and architecture decisions self-directed.",
+  "professional_summary": "Full-stack Junior Software Developer (PHP, .NET, React/TypeScript) shipping production systems for the hospitality and hotel industry. He uses AI coding assistants (Claude, Codex, ChatGPT) daily as a force multiplier for fast, production-ready — while keeping architecture and logic self-directed. Key deliverables: a BIR-compliant accounting integration (CAS) used live across the client base, the Halo Protocol NSSM-based service that automates tech-support triage across client deployments, and the Xenia Online microservice syncing on-premise and cloud data via REST/HTTP APIs, DynamoDB, and S3.",
   "skillset": {
     "languages_frameworks": [
       "PHP",
       "JavaScript",
       "TypeScript",
-      "C#",
-      ".NET",
+      "Next.js",
+      "React.js",
       "HTML5",
       "CSS3",
       "jQuery",
       "Node.js",
-      "React.js"
+      "C#",
+      ".NET"
     ],
     "databases": [
       "MySQL (query optimization, joins, temporary tables, stored procedures)",
@@ -107,6 +108,7 @@
       "Git",
       "GitHub",
       "GitHub Actions (CI/CD)",
+      "NSSM (Windows background services)",
       "Agile/Scrum",
       "Postman",
       "Chart.js",
@@ -114,9 +116,12 @@
       "Bootstrap"
     ],
     "ai_assisted_development": [
+      "Claude",
       "Codex",
       "ChatGPT",
-      "Claude — daily use for implementation speed with self-directed logic and architecture"
+      "Daily \"vibe coding\" workflow — fast, production-ready implementation with self-directed logic and architecture; comfortable adopting new AI coding tools like Claude Code",
+      "Orchestration Engineering",
+      "Loop Engineering"
     ],
     "operating_systems": [
       "Windows"
@@ -156,11 +161,11 @@
         "BIR-compliant CAS integration generating Sales/Receipt Journal Entries",
         "Chart.js analytics and QR code features in reporting workflow"
       ],
-      "impact": "Reduced a core reporting query from 15 seconds to ~500ms (~97% faster) using corrected joins, temporary tables, and stored procedures — serving ~700 users across ~250 client properties."
+      "impact": "Client-facing, production feature used live across the client base — generates Sales Journal Entries, Receipt Journal Entries, and receipts for BIR tax compliance."
     },
     {
       "name": "XOLF | Online Check-in System (with Xenia Online microservice)",
-      "stack": ["React", "TypeScript", "Node.js", "C#/.NET", "AWS Lambda", "AWS S3", "DynamoDB"],
+      "stack": ["React", "TypeScript", "Next.js", "C#/.NET", "Node.js", "AWS S3", "DynamoDB", "REST/HTTP APIs"],
       "features": [
         "User authentication",
         "Booking management",
@@ -168,7 +173,17 @@
         "Background data sync between on-premise and cloud servers",
         "Image upload service storing user files in AWS S3"
       ],
-      "impact": "Built Xenia Online, a background C#/.NET microservice syncing reservation data via DynamoDB HTTP APIs, plus a Node.js image-upload pipeline to S3."
+      "impact": "Built Xenia Online, a background microservice in C#/.NET syncing reservation data between on-premise and cloud servers via REST/HTTP APIs and DynamoDB, plus a Node.js image-upload pipeline to S3."
+    },
+    {
+      "name": "Halo Protocol | Tech-Support Triage Automation",
+      "stack": ["C#/.NET", "NSSM", "SQL diagnostic queries", "Windows services"],
+      "features": [
+        "Lightweight Windows background service run via NSSM",
+        "Automatically runs a diagnostic query across every client deployment whenever a critical bug is identified",
+        "Eliminates repetitive manual per-client tech-support triage work"
+      ],
+      "impact": "Cut manual per-client triage time by automating the diagnostic run across all deployments."
     },
     {
       "name": "SLFreemed | Medicine Inventory (Capstone Project)",
@@ -181,12 +196,9 @@
     }
   ],
   "contributions": [
-    "Develops and optimizes backend APIs in C#/.NET, PHP, and MySQL as part of a 9-developer web app team within a 25-developer organization spanning 5 teams.",
-    "Integrated a BIR-compliant Compliance Accounting System (CAS) with PHP, JavaScript, jQuery, and REST APIs, generating SJE/RJE entries used in live hotel operations.",
-    "Built Xenia Online, a background microservice syncing on-premise and cloud data via DynamoDB and S3.",
-    "Improved UI performance and maintainability by refactoring React/TypeScript components.",
-    "Set up a Git-based CI/CD pipeline that reduced deployment steps by 50%.",
-    "Uses AI coding assistants (Codex, ChatGPT, Claude) daily to accelerate implementation while keeping design decisions self-directed."
+    "Built responsive, reusable front-end components and refactored React/TypeScript UI for consistency, maintainability, and reduced load time.",
+    "Set up a Git-based CI/CD pipeline that reduced deployment steps by 50% and helped maintain on-premise backend services.",
+    "Uses AI coding assistants (Claude, Codex, ChatGPT) daily to accelerate implementation while keeping logic, architecture, and code-quality decisions self-directed."
   ],
   "personal_traits": [
     "Strong problem-solving, collaboration, and code-review habits",

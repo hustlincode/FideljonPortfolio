@@ -5,7 +5,7 @@ import Github from "./Github";
 const GROUPS = [
   {
     label: "Stack",
-    items: ["PHP", "JavaScript", "Node.js", "React", "MySQL", "Azure DevOps"]
+    items: ["React", "TypeScript", "Next.js", "PHP", "JavaScript", "Node.js", "MySQL"]
   },
   {
     label: "Tools",

@@ -80,7 +80,7 @@ function Home2() {
             <p className="home-about-body">
               I fell in love with programming and have gained substantial experience in the field.
               <br />
-              <br />I am proficient in
+<br />I am proficient in
               <i>
                 <b className="purple"> PHP, JavaScript, and MySQL. </b>
               </i>
